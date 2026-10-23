@@ -111,3 +111,29 @@ def callback_inline(call):
         )
         
 bot.polling(none_stop=True)
+
+
+import os
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
+
+# Простой HTTP-сервер, чтобы Render видел открытый порт
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running!")
+
+def run_web_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(('0.0.0.0', port), SimpleHandler)
+    server.serve_forever()
+
+# Запускаем веб-сервер в фоне
+web_thread = threading.Thread(target=run_web_server)
+web_thread.daemon = True
+web_thread.start()
+
+# Здесь ваш стандартный запуск бота (например, bot.infinity_polling())
+if __name__ == '__main__':
+    bot.infinity_polling()
